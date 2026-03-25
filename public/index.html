@@ -3,176 +3,1023 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mi Perfil y CRUD</title>
+  <title>Santiago - Perfil & CRUD Usuarios</title>
+  <meta name="description" content="Aplicación CRUD de usuarios con perfil personal desplegada en Render">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f7f6;
-      color: #333;
+    * {
       margin: 0;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .container {
-      width: 100%;
-      max-width: 800px;
-    }
-    .card {
-      background: white;
-      padding: 20px;
-      margin-bottom: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    h1, h2 {
-      margin-top: 0;
-      color: #2c3e50;
-    }
-    .profile-info {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-    .avatar {
-      font-size: 3rem;
-    }
-    .form-group {
-      margin-bottom: 15px;
-    }
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: bold;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      padding: 0;
       box-sizing: border-box;
     }
-    button {
-      background-color: #3498db;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 1rem;
+
+    :root {
+      --bg-primary: #0f0f1a;
+      --bg-secondary: #1a1a2e;
+      --bg-card: rgba(30, 30, 60, 0.6);
+      --bg-card-hover: rgba(40, 40, 80, 0.7);
+      --accent-primary: #6c63ff;
+      --accent-secondary: #00d4aa;
+      --accent-danger: #ff6b6b;
+      --accent-warning: #ffd93d;
+      --text-primary: #e8e8f0;
+      --text-secondary: #a0a0c0;
+      --text-muted: #6a6a8a;
+      --border-color: rgba(108, 99, 255, 0.15);
+      --glow-primary: rgba(108, 99, 255, 0.3);
+      --glow-secondary: rgba(0, 212, 170, 0.3);
+      --gradient-1: linear-gradient(135deg, #6c63ff, #00d4aa);
+      --gradient-2: linear-gradient(135deg, #ff6b6b, #ffd93d);
+      --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.4);
+      --shadow-glow: 0 0 30px rgba(108, 99, 255, 0.15);
     }
-    button:hover {
-      background-color: #2980b9;
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
     }
-    .btn-delete {
-      background-color: #e74c3c;
-      padding: 5px 10px;
-      font-size: 0.9rem;
+
+    /* Animated Background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: 
+        radial-gradient(ellipse at 20% 0%, rgba(108, 99, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(0, 212, 170, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(255, 107, 107, 0.03) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
     }
-    .btn-delete:hover {
-      background-color: #c0392b;
+
+    /* Floating Orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      animation: float 20s ease-in-out infinite;
     }
-    .user-list {
-      list-style: none;
-      padding: 0;
+    .orb-1 {
+      width: 400px; height: 400px;
+      background: rgba(108, 99, 255, 0.07);
+      top: -100px; left: -100px;
+      animation-delay: 0s;
     }
-    .user-item {
+    .orb-2 {
+      width: 300px; height: 300px;
+      background: rgba(0, 212, 170, 0.05);
+      bottom: -50px; right: -50px;
+      animation-delay: -7s;
+    }
+    .orb-3 {
+      width: 200px; height: 200px;
+      background: rgba(255, 107, 107, 0.04);
+      top: 50%; left: 50%;
+      animation-delay: -14s;
+    }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(30px, -30px) scale(1.05); }
+      50% { transform: translate(-20px, 20px) scale(0.95); }
+      75% { transform: translate(15px, 15px) scale(1.02); }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    /* Navigation */
+    .nav {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #f9f9f9;
-      padding: 10px 15px;
-      border: 1px solid #eee;
-      border-radius: 4px;
-      margin-bottom: 10px;
+      padding: 16px 24px;
+      margin-bottom: 40px;
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
     }
-    .user-item span {
-      font-weight: bold;
-      color: #34495e;
+    .nav-logo {
+      font-size: 1.3rem;
+      font-weight: 800;
+      background: var(--gradient-1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .nav-links {
+      display: flex;
+      gap: 8px;
+    }
+    .nav-link {
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      background: none;
+    }
+    .nav-link:hover, .nav-link.active {
+      background: rgba(108, 99, 255, 0.15);
+      color: var(--accent-primary);
+    }
+
+    /* Sections */
+    .section {
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+    .section.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Profile Section */
+    .profile-hero {
+      text-align: center;
+      padding: 60px 30px;
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .profile-hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: var(--gradient-1);
+    }
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: var(--gradient-1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      margin: 0 auto 24px;
+      box-shadow: 0 0 40px var(--glow-primary);
+      animation: pulse 3s ease-in-out infinite;
+      position: relative;
+    }
+    .profile-avatar::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: var(--gradient-1);
+      z-index: -1;
+      opacity: 0.5;
+      filter: blur(10px);
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 30px var(--glow-primary); }
+      50% { box-shadow: 0 0 50px var(--glow-primary), 0 0 80px rgba(108, 99, 255, 0.1); }
+    }
+    .profile-name {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      background: var(--gradient-1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .profile-role {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+      font-weight: 300;
+    }
+    .profile-bio {
+      max-width: 500px;
+      margin: 0 auto 32px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .profile-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: rgba(108, 99, 255, 0.08);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px 16px;
+      transition: all 0.3s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent-primary);
+      box-shadow: var(--shadow-glow);
+    }
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 800;
+      background: var(--gradient-1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
+
+    /* Skills Section */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .skill-tag {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px 12px;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: all 0.3s ease;
+    }
+    .skill-tag:hover {
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-glow);
+    }
+    .skill-tag .skill-icon {
+      font-size: 1.5rem;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    /* Card General */
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 32px;
+      margin-bottom: 24px;
+      transition: all 0.3s ease;
+    }
+    .card:hover {
+      border-color: rgba(108, 99, 255, 0.3);
+      box-shadow: var(--shadow-glow);
+    }
+    .card-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-title .icon {
+      font-size: 1.3rem;
+    }
+    .card-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    /* Contact Links */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      background: rgba(108, 99, 255, 0.06);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      text-decoration: none;
+      color: var(--text-secondary);
+      transition: all 0.3s ease;
+    }
+    .contact-item:hover {
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+      transform: translateY(-2px);
+    }
+    .contact-icon {
+      font-size: 1.4rem;
+    }
+    .contact-text {
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    /* CRUD Section */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .form-group {
+      margin-bottom: 0;
+    }
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+    }
+    .form-input {
+      width: 100%;
+      padding: 14px 16px;
+      background: rgba(15, 15, 26, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+    .form-input:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 20px var(--glow-primary);
+    }
+    .form-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .btn-primary {
+      background: var(--gradient-1);
+      color: white;
+      box-shadow: 0 4px 20px var(--glow-primary);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px var(--glow-primary);
+    }
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+    .btn-cancel {
+      background: rgba(108, 99, 255, 0.1);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+    }
+    .btn-cancel:hover {
+      background: rgba(108, 99, 255, 0.2);
+      color: var(--text-primary);
+    }
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    /* User Table */
+    .users-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 8px;
+    }
+    .users-table thead th {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .users-table tbody tr {
+      background: rgba(15, 15, 26, 0.4);
+      transition: all 0.3s ease;
+    }
+    .users-table tbody tr:hover {
+      background: rgba(108, 99, 255, 0.08);
+      transform: translateX(4px);
+    }
+    .users-table td {
+      padding: 16px;
+      font-size: 0.9rem;
+      vertical-align: middle;
+    }
+    .users-table td:first-child {
+      border-radius: 12px 0 0 12px;
+    }
+    .users-table td:last-child {
+      border-radius: 0 12px 12px 0;
+    }
+    .user-id {
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      background: rgba(108, 99, 255, 0.1);
+      padding: 4px 10px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+    .user-name {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .user-email {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    .action-btns {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      background: transparent;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    .btn-icon.edit:hover {
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+      background: rgba(108, 99, 255, 0.1);
+    }
+    .btn-icon.delete:hover {
+      border-color: var(--accent-danger);
+      color: var(--accent-danger);
+      background: rgba(255, 107, 107, 0.1);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+    .empty-state .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    .empty-state p {
+      font-size: 0.95rem;
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .badge-success {
+      background: rgba(0, 212, 170, 0.1);
+      color: var(--accent-secondary);
+      border: 1px solid rgba(0, 212, 170, 0.2);
+    }
+    .badge-count {
+      background: rgba(108, 99, 255, 0.15);
+      color: var(--accent-primary);
+      border: 1px solid rgba(108, 99, 255, 0.2);
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .toast {
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      backdrop-filter: blur(20px);
+      border: 1px solid;
+      animation: slideInRight 0.4s ease, fadeOut 0.4s ease 2.6s forwards;
+      max-width: 350px;
+    }
+    .toast-success {
+      background: rgba(0, 212, 170, 0.15);
+      border-color: rgba(0, 212, 170, 0.3);
+      color: var(--accent-secondary);
+    }
+    .toast-error {
+      background: rgba(255, 107, 107, 0.15);
+      border-color: rgba(255, 107, 107, 0.3);
+      color: var(--accent-danger);
+    }
+    @keyframes slideInRight {
+      from { transform: translateX(100px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes fadeOut {
+      to { opacity: 0; transform: translateY(-10px); }
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.3s ease;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 32px;
+      width: 90%;
+      max-width: 480px;
+      animation: scaleIn 0.3s ease;
+    }
+    @keyframes scaleIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+    .footer a {
+      color: var(--accent-primary);
+      text-decoration: none;
+    }
+
+    /* Loading Spinner */
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .profile-name { font-size: 1.8rem; }
+      .profile-stats { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .contact-grid { grid-template-columns: 1fr; }
+      .skills-grid { grid-template-columns: repeat(3, 1fr); }
+      .nav { flex-direction: column; gap: 12px; }
+      .users-table { font-size: 0.8rem; }
+      .action-btns { flex-direction: column; }
     }
   </style>
 </head>
 <body>
 
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+<div class="toast-container" id="toastContainer"></div>
+
 <div class="container">
-  <div class="card">
-    <h2>Registrar Nuevo Usuario</h2>
-    <form id="userForm">
-      <div class="form-group">
-        <label for="nombreInput">Nombre</label>
-        <input type="text" id="nombreInput" required placeholder="">
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-logo">⚡ Santiago SL</div>
+    <div class="nav-links">
+      <button class="nav-link active" onclick="showSection('profile')" id="nav-profile">👤 Perfil</button>
+      <button class="nav-link" onclick="showSection('crud')" id="nav-crud">📋 Usuarios</button>
+    </div>
+  </nav>
+
+  <!-- ========== PROFILE SECTION ========== -->
+  <div class="section active" id="section-profile">
+    <div class="profile-hero">
+      <div class="profile-avatar">👨‍💻</div>
+      <h1 class="profile-name">Santiago </h1>
+      <p class="profile-role">Estudiante de Diseño y desarrollo de software</p>
+      <p class="profile-bio">
+        Apasionado por el desarrollo web y las bases de datos. 
+        Actualmente aprendiendo Node.js, Express y PostgreSQL 
+        para construir aplicaciones full-stack modernas.
+      </p>
+      <span class="badge badge-success">🟢 Disponible para proyectos</span>
+    </div>
+
+    <div class="profile-stats">
+      <div class="stat-card">
+        <div class="stat-number">4+</div>
+        <div class="stat-label">Proyectos</div>
       </div>
-      <div class="form-group">
-        <label for="correoInput">Correo Electrónico</label>
-        <input type="email" id="correoInput" required placeholder="">
+      <div class="stat-card">
+        <div class="stat-number">5+</div>
+        <div class="stat-label">Tecnologías</div>
       </div>
-      <button type="submit">Guardar</button>
+      <div class="stat-card">
+        <div class="stat-number">2026</div>
+        <div class="stat-label">Semestre Actual</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🛠️</span> Habilidades</div>
+      <p class="card-subtitle">Tecnologías y herramientas que manejo</p>
+      <div class="skills-grid">
+        <div class="skill-tag"><span class="skill-icon">🟨</span>JavaScript</div>
+        <div class="skill-tag"><span class="skill-icon">🟩</span>Node.js</div>
+        <div class="skill-tag"><span class="skill-icon">⚡</span>Express</div>
+        <div class="skill-tag"><span class="skill-icon">🐘</span>PostgreSQL</div>
+        <div class="skill-tag"><span class="skill-icon">🌐</span>HTML/CSS</div>
+        <div class="skill-tag"><span class="skill-icon">🐙</span>Git/GitHub</div>
+        <div class="skill-tag"><span class="skill-icon">🚀</span>Render</div>
+        <div class="skill-tag"><span class="skill-icon">📦</span>npm</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">📬</span> Contacto</div>
+      <p class="card-subtitle">¿Quieres contactarme? Aquí están mis redes</p>
+      <div class="contact-grid">
+        <a href="https://github.com/sant1ago-sl" target="_blank" class="contact-item">
+          <span class="contact-icon">🐙</span>
+          <span class="contact-text">GitHub</span>
+        </a>
+        <a href="santiagoagustin004@gmail.com" class="contact-item">
+          <span class="contact-icon">📧</span>
+          <span class="contact-text">Email</span>
+        </a>
+        <a href="#" class="contact-item">
+          <span class="contact-icon">💼</span>
+          <span class="contact-text">LinkedIn</span>
+        </a>
+        <a href="https://santiago-sp.github.io/page_web/" class="contact-item">
+          <span class="contact-icon">🌍</span>
+          <span class="contact-text">Portfolio</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== CRUD SECTION ========== -->
+  <div class="section" id="section-crud">
+    
+    <!-- Form Card -->
+    <div class="card">
+      <div class="card-title">
+        <span class="icon" id="formIcon">➕</span>
+        <span id="formTitle">Nuevo Usuario</span>
+      </div>
+      <p class="card-subtitle" id="formSubtitle">Completa los campos para registrar un nuevo usuario</p>
+      
+      <form id="userForm">
+        <input type="hidden" id="editId" value="">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="nombreInput">Nombre</label>
+            <input type="text" class="form-input" id="nombreInput" required placeholder="Ej: Juan Pérez">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="correoInput">Correo Electrónico</label>
+            <input type="email" class="form-input" id="correoInput" required placeholder="Ej: juan@correo.com">
+          </div>
+        </div>
+        <div class="btn-group">
+          <button type="submit" class="btn btn-primary" id="submitBtn">
+            <span id="submitText">➕ Crear Usuario</span>
+          </button>
+          <button type="button" class="btn btn-cancel" id="cancelBtn" style="display:none" onclick="cancelEdit()">
+            ✖ Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Users List Card -->
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+        <div>
+          <div class="card-title"><span class="icon">👥</span> Usuarios Registrados</div>
+          <p class="card-subtitle" style="margin-bottom:0;">Gestiona los usuarios de la base de datos</p>
+        </div>
+        <span class="badge badge-count" id="userCount">0 usuarios</span>
+      </div>
+
+      <div id="usersContainer">
+        <div class="empty-state">
+          <div class="empty-icon">⏳</div>
+          <p>Cargando usuarios...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>Hecho por <strong>Santiago</strong> • Desplegado en <a href="https://render.com" target="_blank">Render</a></p>
+    <p style="margin-top:6px;">Laboratorio 2 — Base de Datos • 2026</p>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-title">✏️ Editar Usuario</div>
+    <form id="editForm">
+      <input type="hidden" id="editModalId">
+      <div class="form-group" style="margin-bottom:16px;">
+        <label class="form-label" for="editNombre">Nombre</label>
+        <input type="text" class="form-input" id="editNombre" required>
+      </div>
+      <div class="form-group" style="margin-bottom:16px;">
+        <label class="form-label" for="editCorreo">Correo Electrónico</label>
+        <input type="email" class="form-input" id="editCorreo" required>
+      </div>
+      <div class="btn-group">
+        <button type="submit" class="btn btn-primary">💾 Guardar Cambios</button>
+        <button type="button" class="btn btn-cancel" onclick="closeEditModal()">✖ Cancelar</button>
+      </div>
     </form>
   </div>
-
-  <div class="card">
-    <h2>Lista de Usuarios</h2>
-    <ul class="user-list" id="usersList">
-    </ul>
-  </div>
-
 </div>
 
 <script>
-  const userForm = document.getElementById('userForm');
-  const usersList = document.getElementById('usersList');
-  
+  // ========== NAVIGATION ==========
+  function showSection(section) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    document.getElementById(`section-${section}`).classList.add('active');
+    document.getElementById(`nav-${section}`).classList.add('active');
+    if (section === 'crud') loadUsers();
+  }
+
+  // ========== TOAST NOTIFICATIONS ==========
+  function showToast(message, type = 'success') {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  }
+
+  // ========== API URL ==========
+  const API = window.location.origin;
+
+  // ========== LOAD USERS ==========
   async function loadUsers() {
+    const container = document.getElementById('usersContainer');
     try {
-      const res = await fetch('/usuarios');
+      const res = await fetch(`${API}/usuarios`);
       const users = await res.json();
       
-      usersList.innerHTML = '';
-      
+      document.getElementById('userCount').textContent = `${users.length} usuario${users.length !== 1 ? 's' : ''}`;
+
       if (users.length === 0) {
-        usersList.innerHTML = '<li>No hay usuarios registrados.</li>';
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <p>No hay usuarios registrados aún.</p>
+            <p style="margin-top:8px; font-size:0.85rem;">¡Crea el primero usando el formulario de arriba!</p>
+          </div>`;
         return;
       }
 
-      users.forEach(user => {
-        const li = document.createElement('li');
-        li.className = 'user-item';
-        li.innerHTML = `
-          <div>
-            <span>${user.nombre}</span> - ${user.correo}
-          </div>
-          <button class="btn-delete" onclick="deleteUser(${user.id})">Eliminar</button>
-        `;
-        usersList.appendChild(li);
-      });
+      container.innerHTML = `
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${users.map(u => `
+              <tr>
+                <td><span class="user-id">#${u.id}</span></td>
+                <td class="user-name">${escapeHtml(u.nombre)}</td>
+                <td class="user-email">${escapeHtml(u.correo)}</td>
+                <td>
+                  <div class="action-btns">
+                    <button class="btn-icon edit" onclick="openEditModal(${u.id}, '${escapeAttr(u.nombre)}', '${escapeAttr(u.correo)}')" title="Editar">✏️</button>
+                    <button class="btn-icon delete" onclick="deleteUser(${u.id})" title="Eliminar">🗑️</button>
+                  </div>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>`;
     } catch (err) {
-      usersList.innerHTML = '<li>Error cargando usuarios.</li>';
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">⚠️</div>
+          <p>Error cargando usuarios</p>
+        </div>`;
+      showToast('Error conectando con el servidor', 'error');
     }
   }
 
-  userForm.addEventListener('submit', async (e) => {
+  // ========== CREATE USER ==========
+  document.getElementById('userForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const nombre = document.getElementById('nombreInput').value;
-    const correo = document.getElementById('correoInput').value;
-
-    await fetch('/usuarios', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nombre, correo })
-    });
+    const nombre = document.getElementById('nombreInput').value.trim();
+    const correo = document.getElementById('correoInput').value.trim();
     
-    userForm.reset();
-    loadUsers();
+    if (!nombre || !correo) return;
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Guardando...';
+
+    try {
+      const res = await fetch(`${API}/usuarios`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre, correo })
+      });
+      
+      if (res.ok) {
+        showToast(`✅ Usuario "${nombre}" creado exitosamente`);
+        document.getElementById('userForm').reset();
+        loadUsers();
+      } else {
+        showToast('Error creando usuario', 'error');
+      }
+    } catch (err) {
+      showToast('Error de conexión', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<span id="submitText">➕ Crear Usuario</span>';
+    }
   });
 
+  // ========== EDIT USER (Modal) ==========
+  function openEditModal(id, nombre, correo) {
+    document.getElementById('editModalId').value = id;
+    document.getElementById('editNombre').value = nombre;
+    document.getElementById('editCorreo').value = correo;
+    document.getElementById('editModal').classList.add('active');
+  }
+
+  function closeEditModal() {
+    document.getElementById('editModal').classList.remove('active');
+    document.getElementById('editForm').reset();
+  }
+
+  document.getElementById('editForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('editModalId').value;
+    const nombre = document.getElementById('editNombre').value.trim();
+    const correo = document.getElementById('editCorreo').value.trim();
+
+    try {
+      const res = await fetch(`${API}/usuarios/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre, correo })
+      });
+
+      if (res.ok) {
+        showToast(`✅ Usuario actualizado exitosamente`);
+        closeEditModal();
+        loadUsers();
+      } else {
+        showToast('Error actualizando usuario', 'error');
+      }
+    } catch (err) {
+      showToast('Error de conexión', 'error');
+    }
+  });
+
+  // Close modal on overlay click
+  document.getElementById('editModal').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeEditModal();
+  });
+
+  // ========== DELETE USER ==========
   async function deleteUser(id) {
-    if(confirm("¿Eliminar usuario?")) {
-      await fetch(`/usuarios/${id}`, { method: 'DELETE' });
-      loadUsers();
+    if (!confirm('¿Estás seguro de eliminar este usuario?')) return;
+    
+    try {
+      const res = await fetch(`${API}/usuarios/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        showToast('🗑️ Usuario eliminado');
+        loadUsers();
+      } else {
+        showToast('Error eliminando usuario', 'error');
+      }
+    } catch (err) {
+      showToast('Error de conexión', 'error');
     }
   }
 
+  // ========== HELPERS ==========
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+  
+  function escapeAttr(str) {
+    return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
+  }
+
+  // Initial load
   loadUsers();
 </script>
 
